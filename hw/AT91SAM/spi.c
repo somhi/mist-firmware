@@ -12,11 +12,10 @@ void spi_init() {
     *AT91C_SPI_MR = AT91C_SPI_MSTR | AT91C_SPI_MODFDIS  | (0x01 << 16);
 
     // SPI CS register
-    AT91C_SPI_CSR[0] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (2 << 8) | (0x04 << 16) | (0x00 << 24); // USB
+    AT91C_SPI_CSR[0] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (3 << 8) | (0x04 << 16) | (0x00 << 24); // USB   (default 2)
     AT91C_SPI_CSR[1] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (48 << 8) | (0x04 << 16) | (0x00 << 24); // MMC/CONF_DATA
-    AT91C_SPI_CSR[2] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (2 << 8) | (0x04 << 16) | (0x00 << 24); // Data IO
-    AT91C_SPI_CSR[3] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (2 << 8) | (0x04 << 16) | (0x00 << 24); // OSD
-
+    AT91C_SPI_CSR[2] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (3 << 8) | (0x04 << 16) | (0x00 << 24); // Data IO (default 2)
+    AT91C_SPI_CSR[3] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (3 << 8) | (0x04 << 16) | (0x00 << 24); // OSD (default 2)
     // Configure pins for SPI use
     AT91C_BASE_PIOA->PIO_PDR = AT91C_PA14_SPCK | AT91C_PA13_MOSI | AT91C_PA12_MISO | AT91C_PA11_NPCS0 | AT91C_PA10_NPCS2 | AT91C_PA3_NPCS3;
     AT91C_BASE_PIOA->PIO_BSR = AT91C_PA9_NPCS1 | AT91C_PA10_NPCS2 | AT91C_PA3_NPCS3;
@@ -163,7 +162,8 @@ void spi_slow() {
 
 void spi_fast() {
   // set appropriate SPI speed for SD/SDHC card (max 25 Mhz)
-  AT91C_SPI_CSR[1] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (4 << 16) | (SPI_SDC_CLK_VALUE << 8); // 24 MHz SPI clock
+  //AT91C_SPI_CSR[1] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (4 << 16) | (SPI_SDC_CLK_VALUE << 8); // 24 MHz SPI clock
+  AT91C_SPI_CSR[1] = AT91C_SPI_CPOL | AT91C_SPI_CSAAT | (4 << 16) | (3 << 8); // 16 MHz SPI clock
   spi_speed = SPI_SDC_CLK_VALUE;
 }
 
