@@ -47,6 +47,10 @@ static uint8_t tx_buf_fill;
 
 static uint8_t adapter_count = 0;
 
+uint8_t get_pl2303s(void) {
+  return adapter_count;
+}
+
 // return true if there's a pl2303 present and if that has
 // its tx buffer full. This will then stop reading data from the 
 // core so it can throttle 
@@ -247,7 +251,7 @@ static uint8_t pl2303_parse_conf0(usb_device_t *dev, uint16_t len) {
   
   if(len != 0) {
     pl2303_debugf("Config underrun: %d", len);
-    return USB_ERROR_CONFIGURAION_SIZE_MISMATCH;
+    return USB_ERROR_CONFIGURATION_SIZE_MISMATCH;
   }
 
   return 0;
