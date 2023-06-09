@@ -557,7 +557,6 @@ static char GetMenuItem_System(uint8_t idx, char action, menu_item_t *item) {
 					item->stipple = !item->active;
 					break;
 				case 10:
-				case 12:
 					item->active = 0;
 					break;
 				case 11:
@@ -567,6 +566,13 @@ static char GetMenuItem_System(uint8_t idx, char action, menu_item_t *item) {
 					else strcpy(s, OsdCoreName());
 					s[28] = 0;
 					item->item = s;
+					item->active = 0;
+					break;
+				case 12:
+					if(arc_get_rbfname() && *arc_get_rbfname()) {
+						siprintf(s, "%*s%s.RBF", (29-strlen(arc_get_rbfname()))/2-2, " ", arc_get_rbfname());
+						item->item = s;
+					}
 					item->active = 0;
 					break;
 				case 13:
@@ -657,17 +663,27 @@ static char GetMenuItem_System(uint8_t idx, char action, menu_item_t *item) {
 							virtual_joystick_remap_update(&mapping);
 							break;
 						}
-
-						siprintf(s, "      Press button %s", buttons[setup_phase - 1]);
-						joy = StateUsbJoyGet(joy_num);
-						joy |= StateUsbJoyGetExtra(joy_num) << 8;
-						if (!joy_prev && joy) {
-							for (int i = 0; i<16; i++) {
-								if (joy & (1<<i)) mapping.mapping[i] = 1<<(setup_phase - 1);
-							}
+						const char *button = arc_get_buttons();
+						if (setup_phase > 4 && button && *button)
+							button = arc_get_button(setup_phase - 5);
+						else
+							button = buttons[setup_phase - 1];
+						if (!button || !*button || *button == '-') {
+							// skip this button
 							setup_phase++;
+							s[0] = 0;
+						} else {
+							siprintf(s, "%*sPress button %s", (29-13-strlen(button))/2, " ", button);
+							joy = StateUsbJoyGet(joy_num);
+							joy |= StateUsbJoyGetExtra(joy_num) << 8;
+							if (!joy_prev && joy) {
+								for (int i = 0; i<16; i++) {
+									if (joy & (1<<i)) mapping.mapping[i] = 1<<(setup_phase - 1);
+								}
+								setup_phase++;
+							}
+							joy_prev = joy;
 						}
-						joy_prev = joy;
 						item->item = s;
 					}
 					break;
